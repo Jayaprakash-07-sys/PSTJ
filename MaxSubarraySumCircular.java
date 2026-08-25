@@ -1,0 +1,62 @@
+import java.util.Scanner;
+
+public class MaxSubarraySumCircular {
+
+    public static int maxSubarraySumCircular(int[] nums) {
+
+        int totalSum = 0;
+
+        int currentMax = 0;
+        int maxSum = Integer.MIN_VALUE;
+
+        int currentMin = 0;
+        int minSum = Integer.MAX_VALUE;
+
+        for (int num : nums) {
+
+            // Kadane's algorithm for maximum subarray
+            currentMax = Math.max(num, currentMax + num);
+            maxSum = Math.max(maxSum, currentMax);
+
+            // Kadane's algorithm for minimum subarray
+            currentMin = Math.min(num, currentMin + num);
+            minSum = Math.min(minSum, currentMin);
+
+            totalSum += num;
+        }
+
+        // If all elements are negative,
+        // totalSum - minSum would become 0,
+        // which is not a valid non-empty subarray.
+        if (maxSum < 0) {
+            return maxSum;
+        }
+
+        // Maximum of:
+        // 1. Normal subarray
+        // 2. Circular subarray
+        return Math.max(maxSum, totalSum - minSum);
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter the size of the array: ");
+        int n = sc.nextInt();
+
+        int[] nums = new int[n];
+
+        System.out.println("Enter the array elements:");
+
+        for (int i = 0; i < n; i++) {
+            nums[i] = sc.nextInt();
+        }
+
+        int result = maxSubarraySumCircular(nums);
+
+        System.out.println("Maximum Circular Subarray Sum = " + result);
+
+        sc.close();
+    }
+}

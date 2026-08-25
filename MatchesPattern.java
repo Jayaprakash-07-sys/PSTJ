@@ -1,0 +1,84 @@
+import java.util.*;
+
+public class MatchesPattern {
+
+    public static boolean matchesPattern(String word, String pattern) {
+
+        // Mapping from pattern character -> word character
+        char[] patternToWord = new char[26];
+
+        // Mapping from word character -> pattern character
+        char[] wordToPattern = new char[26];
+
+        // Initialize arrays with '\0'
+        Arrays.fill(patternToWord, '\0');
+        Arrays.fill(wordToPattern, '\0');
+
+        for (int i = 0; i < pattern.length(); i++) {
+
+            char p = pattern.charAt(i);
+            char w = word.charAt(i);
+
+            // Check pattern -> word mapping
+            if (patternToWord[p - 'a'] != '\0' &&
+                patternToWord[p - 'a'] != w) {
+                return false;
+            }
+
+            // Check word -> pattern mapping
+            if (wordToPattern[w - 'a'] != '\0' &&
+                wordToPattern[w - 'a'] != p) {
+                return false;
+            }
+
+            // Create the mappings
+            patternToWord[p - 'a'] = w;
+            wordToPattern[w - 'a'] = p;
+        }
+
+        return true;
+    }
+
+    public static List<String> findAndReplacePattern(
+            String[] words, String pattern) {
+
+        List<String> result = new ArrayList<>();
+
+        for (String word : words) {
+
+            if (matchesPattern(word, pattern)) {
+                result.add(word);
+            }
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of words: ");
+        int n = sc.nextInt();
+
+        String[] words = new String[n];
+
+        System.out.println("Enter the words:");
+
+        for (int i = 0; i < n; i++) {
+            words[i] = sc.next();
+        }
+
+        System.out.print("Enter the pattern: ");
+        String pattern = sc.next();
+
+        List<String> result =
+            findAndReplacePattern(words, pattern);
+
+        System.out.println("Matching words:");
+
+        System.out.println(result);
+
+        sc.close();
+    }
+}
