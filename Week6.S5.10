@@ -1,0 +1,199 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static int[] manacher(String s) {
+        int n = s.length();
+
+        // d1[i] = radius of odd palindrome centered at i
+        int[] d1 = new int[n];
+
+        for (int i = 0, l = 0, r = -1; i < n; i++) {
+            int k = (i > r) ? 1 : Math.min(d1[l + r - i], r - i + 1);
+
+            while (i - k >= 0 && i + k < n &&
+                   s.charAt(i - k) == s.charAt(i + k)) {
+                k++;
+            }
+
+            d1[i] = k--;
+
+            if (i + k > r) {
+                l = i - k;
+                r = i + k;
+            }
+        }
+
+        // d2[i] = radius of even palindrome centered between i-1 and i
+        int[] d2 = new int[n];
+
+        for (int i = 0, l = 0, r = -1; i < n; i++) {
+            int k = (i > r) ? 0 : Math.min(d2[l + r - i + 1], r - i + 1);
+
+            while (i - k - 1 >= 0 && i + k < n &&
+                   s.charAt(i - k - 1) == s.charAt(i + k)) {
+                k++;
+            }
+
+            d2[i] = k--;
+
+            if (i + k > r) {
+                l = i - k - 1;
+                r = i + k;
+            }
+        }
+
+        return null;
+    }
+
+    static int[] getOdd(String s) {
+        int n = s.length();
+        int[] d = new int[n];
+
+        for (int i = 0, l = 0, r = -1; i < n; i++) {
+            int k = (i > r) ? 1 : Math.min(d[l + r - i], r - i + 1);
+
+            while (i - k >= 0 && i + k < n &&
+                   s.charAt(i - k) == s.charAt(i + k)) {
+                k++;
+            }
+
+            d[i] = k;
+
+            if (i + k - 1 > r) {
+                l = i - k + 1;
+                r = i + k - 1;
+            }
+        }
+
+        return d;
+    }
+
+    static int[] getEven(String s) {
+        int n = s.length();
+        int[] d = new int[n];
+
+        for (int i = 0, l = 0, r = -1; i < n; i++) {
+            int k = (i > r) ? 0 : Math.min(d[l + r - i + 1], r - i + 1);
+
+            while (i - k - 1 >= 0 && i + k < n &&
+                   s.charAt(i - k - 1) == s.charAt(i + k)) {
+                k++;
+            }
+
+            d[i] = k;
+
+            if (i + k - 1 > r) {
+                l = i - k;
+                r = i + k - 1;
+            }
+        }
+
+        return d;
+    }
+
+    /*
+     * Returns the longest palindrome contained completely
+     * inside [left, right].
+     */
+    static int longestPalindrome(String s, int left, int right) {
+        int n = s.length();
+
+        int[] odd = getOdd(s);
+        int[] even = getEven(s);
+
+        int answer = 1;
+
+        for (int i = left; i <= right; i++) {
+
+            // Odd palindrome
+            int radius = odd[i];
+
+            int start = i - radius + 1;
+            int end = i + radius - 1;
+
+            start = Math.max(start, left);
+            end = Math.min(end, right);
+
+            if (start <= end) {
+                answer = Math.max(answer, end - start + 1);
+            }
+
+            // Even palindrome
+            radius = even[i];
+
+            start = i - radius;
+            end = i + radius - 1;
+
+            start = Math.max(start, left);
+            end = Math.min(end, right);
+
+            if (start <= end) {
+                answer = Math.max(answer, end - start + 1);
+            }
+        }
+
+        return answer;
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(System.in));
+
+        int n = Integer.parseInt(br.readLine().trim());
+        String s = br.readLine().trim();
+
+        String doubled = s + s;
+
+        int[] odd = getOdd(doubled);
+        int[] even = getEven(doubled);
+
+        StringBuilder output = new StringBuilder();
+
+        for (int start = 0; start < n; start++) {
+
+            int left = start;
+            int right = start + n - 1;
+
+            int answer = 1;
+
+            // Odd length palindromes
+            for (int center = left; center <= right; center++) {
+
+                int radius = odd[center];
+
+                int l = center - radius + 1;
+                int r = center + radius - 1;
+
+                l = Math.max(l, left);
+                r = Math.min(r, right);
+
+                if (l <= r) {
+                    answer = Math.max(answer, r - l + 1);
+                }
+            }
+
+            // Even length palindromes
+            for (int center = left; center <= right; center++) {
+
+                int radius = even[center];
+
+                int l = center - radius;
+                int r = center + radius - 1;
+
+                l = Math.max(l, left);
+                r = Math.min(r, right);
+
+                if (l <= r) {
+                    answer = Math.max(answer, r - l + 1);
+                }
+            }
+
+            output.append(answer).append('\n');
+        }
+
+        System.out.print(output);
+    }
+}
